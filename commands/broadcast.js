@@ -1,49 +1,88 @@
 const settings = require('../settings');
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 
 async function broadcastCommand(sock, chatId, message, args) {
-    // Hanya owner yang bisa broadcast - verifikasi berdasarkan JID
     const sender = message.key?.participant || message.key?.remoteJid;
-    const ownerJid = settings.ownerNumber + '@s.whatsapp.net'; // Tambahkan suffix WhatsApp
+    const ownerJid = settings.ownerNumber + '@s.whatsapp.net';
 
     if (sender !== ownerJid) {
-        await sock.sendMessage(chatId, { text: '❌ Kamu tidak punya akses untuk broadcast!' }, { quoted: message });
-        return;
+        return sock.sendMessage(chatId, { text: '❌ Kamu tidak punya akses untuk broadcast!' }, { quoted: message });
     }
 
-    // Ambil teks broadcast dari args
-    const bcText = args.join(' ');
-    if (!bcText) {
-        await sock.sendMessage(chatId, { text: '❌ Usage: .bc <pesan> atau .broadcast <pesan>' }, { quoted: message });
-        return;
-    }
+    // Ambil teks tambahan (caption) tanpa ikut command .bc
+    let bcText = args.join(' ') || '';
+    if (bcText.startsWith('.bc')) bcText = bcText.replace(/^\.bc\s*/, '');
 
-    // Ambil semua grup yang bot join
-    const allChats = await sock.groupFetchAllParticipating();
-    const groups = Object.keys(allChats); // list groupId
+    const quotedMsg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+
+    // Ambil semua grup
+    const allGroups = await sock.groupFetchAllParticipating();
+    const groupIds = Object.keys(allGroups);
 
     let success = 0;
     let failed = 0;
 
-    // Format pesan broadcast sesuai spesifikasi
-    const broadcastMessage = `📢 Broadcast
-
-${bcText}`;
-
-    for (const groupId of groups) {
+    for (const groupId of groupIds) {
         try {
-            await sock.sendMessage(groupId, {
-                text: broadcastMessage
-            });
+            let msgOptions = {};
+
+            if (quotedMsg) {
+                const type = Object.keys(quotedMsg)[0];
+                let buffer;
+
+                // Download media kalau bukan teks
+                if (!['conversation', 'extendedTextMessage'].includes(type)) {
+                    buffer = await downloadMediaMessage({ message: quotedMsg }, 'buffer', {}, { logger: console });
+                }
+
+                switch (type) {
+                    case 'imageMessage':
+                        msgOptions = {
+                            image: buffer,
+                            caption: `*Broadcast dari SantStyle*\n\n${bcText || quotedMsg.imageMessage?.caption || ''}`
+                        };
+                        break;
+                    case 'videoMessage':
+                        msgOptions = {
+                            video: buffer,
+                            caption: `*Broadcast dari SantStyle*\n\n${bcText || quotedMsg.videoMessage?.caption || ''}`
+                        };
+                        break;
+                    case 'audioMessage':
+                        msgOptions = {
+                            audio: buffer,
+                            mimetype: quotedMsg.audioMessage?.mimetype || 'audio/mp4',
+                            ptt: quotedMsg.audioMessage?.ptt || false
+                        };
+                        break;
+                    case 'stickerMessage':
+                        msgOptions = { sticker: buffer };
+                        break;
+                    case 'documentMessage':
+                        msgOptions = {
+                            document: buffer,
+                            mimetype: quotedMsg.documentMessage?.mimetype,
+                            fileName: quotedMsg.documentMessage?.fileName || 'file'
+                        };
+                        break;
+                    default:
+                        msgOptions = { text: `*Broadcast dari SantStyle*\n\n${bcText}` };
+                }
+            } else {
+                msgOptions = { text: `*Broadcast dari SantStyle*\n\n${bcText}` };
+            }
+
+            await sock.sendMessage(groupId, msgOptions);
             success++;
         } catch (err) {
             console.error(`Gagal broadcast ke ${groupId}:`, err);
             failed++;
-            // Continue to next group despite error
         }
     }
 
-    // Kirim notifikasi ke owner
-    await sock.sendMessage(chatId, { text: `✅ Broadcast selesai! Sukses: ${success}, Gagal: ${failed}` }, { quoted: message });
+    await sock.sendMessage(chatId, {
+        text: `✅ Broadcast selesai!\nSukses: ${success}, Gagal: ${failed}`
+    }, { quoted: message });
 }
 
 module.exports = broadcastCommand;

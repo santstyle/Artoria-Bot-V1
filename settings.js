@@ -1,5 +1,6 @@
 const settings = {
   packname: 'Artoria Bot V1',
+  wm: '',
   author: '‎',
   botName: "Artoria Bot V1",
   botOwner: 'SantStyle', // Your name

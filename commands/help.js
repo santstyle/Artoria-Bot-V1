@@ -2,124 +2,113 @@ const settings = require('../settings');
 
 async function menuCommand(sock, chatId, message) {
     const menuMessage = `
-╔════════════════════════════════════════╗
-║        ${settings.botName || 'Artoria Bot V1'}       
-║        Version: ${settings.version || '1.0.0'}
-║        Owner: ${settings.botOwner || 'SantStyle'}
-╚════════════════════════════════════════╝
+👑 *${settings.botName || 'Artoria Bot V1'}*  
+Version: ${settings.version || '1.0.0'}  
+Owner: ${settings.botOwner || 'SantStyle'}  
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 🌐 GENERAL COMMANDS 🌐 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .help
-│ • .menu
-│ • .ping
-│ • .alive
-│ • .owner
-│ • .tts <text>
-│ • .joke
-│ • .quote
-│ • .fact
-│ • .weather <city>
-│ • .news
-│ • .attp <text>
-│ • .lyrics <song_title>
-│ • .8ball <question>
-│ • .groupinfo
-│ • .staff
-│ • .vv
-│ • .trt <text> <lang>
-│ • .ss <link>
-│ • .jid
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 *About Bot*  
+Artoria Bot adalah bot WhatsApp multifungsi untuk membantu aktivitas grup & personal.  
+Nama "Artoria" diambil dari karakter *Artoria Pendragon* dari seri Fate.  
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 👮 ADMIN COMMANDS 👮 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .ban @user
-│ • .promote @user
-│ • .demote @user
-│ • .mute <minutes>
-│ • .unmute
-│ • .delete
-│ • .kick @user
-│ • .warnings @user
-│ • .warn @user
-│ • .antilink
-│ • .antibadword
-│ • .clear
-│ • .tag <message>
-│ • .tagall
-│ • .chatbot
-│ • .resetlink
-│ • .antitag <on/off>
-│ • .welcome <on/off>
-│ • .goodbye <on/off>
+Untuk menghubungi owner bisa gunakan command *.owner*  
+atau langsung chat *SantStyle* jika ada di grup yang sama.  
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 🔒 OWNER COMMANDS 🔒 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .mode
-│ • .autostatus
-│ • .clearsession
-│ • .antidelete
-│ • .cleartmp
-│ • .update
-│ • .setpp <reply image>
-│ • .autoreact
-│ • .autotyping <on/off>
-│ • .autoread <on/off>
+Berikut menu command yang tersedia di *Artoria Bot V1*:  
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 🎨 IMAGE/STICKER 🎨 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .blur <image>
-│ • .simage <sticker>
-│ • .sticker <image>
-│ • .removebg
-│ • .remini
-│ • .crop <image>
-│ • .tgsticker <link>
-│ • .meme
-│ • .take <packname>
-│ • .emojimix <emj1>+<emj2>
+💠 🔒 *OWNER*
+• .mode
+• .autostatus
+• .clearsession
+• .antidelete
+• .cleartmp
+• .update
+• .autoreact
+• .bc
+• .setpp <reply image>
+• .autotyping <on/off>
+• .autoread <on/off>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 🎮 GAME COMMANDS 🎮 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .tictactoe @user
-│ • .hangman
-│ • .guess <letter>
-│ • .trivia
-│ • .answer <answer>
-│ • .truth
-│ • .dare
+💠 🗺️ *LANGUAGE*
+• .setlang id
+• .setlang en
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 🎯 FUN COMMANDS 🎯 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .compliment @user
-│ • .insult @user
-│ • .flirt
-│ • .shayari
-│ • .goodnight
-│ • .roseday
-│ • .character @user
-│ • .wasted @user
-│ • .ship @user
-│ • .simp @user
-│ • .stupid @user [text]
+💠 🌐 *GENERAL*
+• .help
+• .menu
+• .ping
+• .alive
+• .owner
+• .joke
+• .quote
+• .fact
+• .news
+• .groupinfo
+• .staff
+• .attp <text>
+• .weather <city>
+• .tts <text>
+• .lyrics <song_title>
+• .trt <text> <lang>
+• .ss <link>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💠 📥 DOWNLOADER 📥 💠
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ • .play <song_name>
-│ • .song <song_name>
-│ • .instagram <link>
-│ • .facebook <link>
-│ • .tiktok <link>
-│ • .video <song_name>
-│ • .ytmp4 <link>
+💠 👮 *ADMIN*
+• .antitag <on/off>
+• .welcome <on/off>
+• .goodbye <on/off>
+• .ban @user
+• .promote @user
+• .demote @user
+• .mute <minutes>
+• .kick @user
+• .warnings @user
+• .warn @user
+• .tag <message>
+• .unmute
+• .delete
+• .antilink
+• .antibadword
+• .clear
+• .tagall
+• .chatbot
+• .resetlink
 
+💠 🎨 *IMAGE/STICKER*
+• .blur <image>
+• .simage <sticker>
+• .sticker <image>
+• .tgsticker <link>
+• .take <setwm>
+• .emojimix <emj1>+<emj2>
+• .crop <image>
+• .removebg
+• .remini
+• .meme
+
+💠 🎮 *GAME*
+• .hangman
+• .trivia
+• .truth
+• .dare
+
+💠 🤖 *AI*
+• .gpt <question>
+• .gemini <question>
+• .imagine <prompt>
+• .flux <prompt>
+
+💠 📥 *DOWNLOADER*
+• .play <song_name>
+• .song <song_name>
+• .instagram <link>
+• .video <song_name>
+• .facebook <link>
+• .tiktok <link>
+• .ytmp4 <link>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ Powered & Modified By SantStyle
 `;
 
     try {

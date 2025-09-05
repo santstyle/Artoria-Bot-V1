@@ -1,21 +1,21 @@
 const fetch = require('node-fetch');
 
-module.exports = async function quoteCommand(sock, chatId, message) {
+module.exports = async function quoteCommand(sock, chatId, message, args) {
     try {
-        const shizokeys = 'shizo';
-        const res = await fetch(`https://shizoapi.onrender.com/api/texts/quotes?apikey=${shizokeys}`);
-        
-        if (!res.ok) {
-            throw await res.text();
-        }
-        
-        const json = await res.json();
-        const quoteMessage = json.result;
+        let url = 'https://indonesian-quotes-api.vercel.app/api/quotes/random';
+        if (args[0]) url += `?category=${args[0]}`; // example: .quote motivasi
 
-        // Send the quote message
-        await sock.sendMessage(chatId, { text: quoteMessage }, { quoted: message });
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const q = json.data;
+        const quoteMsg = `“${q.quote}”\n— ${q.source || 'Unknown'} (${q.category || 'Unknown'})`;
+
+        await sock.sendMessage(chatId, { text: quoteMsg }, { quoted: message });
     } catch (error) {
         console.error('Error in quote command:', error);
-        await sock.sendMessage(chatId, { text: '❌ Failed to get quote. Please try again later!' }, { quoted: message });
+        await sock.sendMessage(chatId, {
+            text: '❌ Gagal ambil quote. Coba format: .quote [kategori]'
+        }, { quoted: message });
     }
 };

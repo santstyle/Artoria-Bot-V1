@@ -3,9 +3,9 @@ const settings = require('../settings.js');
 
 function formatTime(seconds) {
     const days = Math.floor(seconds / (24 * 60 * 60));
-    seconds = seconds % (24 * 60 * 60);
+    seconds %= (24 * 60 * 60);
     const hours = Math.floor(seconds / (60 * 60));
-    seconds = seconds % (60 * 60);
+    seconds %= (60 * 60);
     const minutes = Math.floor(seconds / 60);
     seconds = Math.floor(seconds % 60);
 
@@ -21,23 +21,25 @@ function formatTime(seconds) {
 async function pingCommand(sock, chatId, message) {
     try {
         const start = Date.now();
-        await sock.sendMessage(chatId, { text: 'Pong!' }, { quoted: message });
+        await sock.sendMessage(chatId, { text: '🏓 Testing ping...' }, { quoted: message });
         const end = Date.now();
-        const ping = Math.round((end - start) / 2);
+        const ping = Math.round(end - start);
 
-        const uptimeInSeconds = process.uptime();
-        const uptimeFormatted = formatTime(uptimeInSeconds);
+        const uptimeFormatted = formatTime(process.uptime());
+
+        // RAM usage info
+        const usedMemory = (process.memoryUsage().rss / 1024 / 1024).toFixed(2);
+        const totalMemory = (os.totalmem() / 1024 / 1024).toFixed(2);
 
         const botInfo = `
-┏━━〔 🤖 𝐊𝐧𝐢𝐠𝐡𝐭𝐁𝐨𝐭-𝐌𝐃 〕━━┓
-┃ 🚀 Ping     : ${ping} ms
+┏━━〔 🤖 Artoria Bot Status 〕━━┓
+┃ ⚡ Ping     : ${ping} ms
 ┃ ⏱️ Uptime   : ${uptimeFormatted}
+┃ 💾 Memory   : ${usedMemory} MB / ${totalMemory} MB
 ┃ 🔖 Version  : v${settings.version}
-┗━━━━━━━━━━━━━━━━━━━┛`.trim();
+┗━━━━━━━━━━━━━━━━━━━━━━━┛`.trim();
 
-        // Reply to the original message with the bot info
-        await sock.sendMessage(chatId, { text: botInfo},{ quoted: message });
-
+        await sock.sendMessage(chatId, { text: botInfo }, { quoted: message });
     } catch (error) {
         console.error('Error in ping command:', error);
         await sock.sendMessage(chatId, { text: '❌ Failed to get bot status.' });

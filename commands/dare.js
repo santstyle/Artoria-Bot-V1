@@ -1,22 +1,20 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 async function dareCommand(sock, chatId, message) {
     try {
-        const shizokeys = 'shizo';
-        const res = await fetch(`https://shizoapi.onrender.com/api/texts/dare?apikey=${shizokeys}`);
-        
-        if (!res.ok) {
-            throw await res.text();
-        }
-        
-        const json = await res.json();
-        const dareMessage = json.result;
+        // Ambil dare random dari API versi Indonesia
+        const res = await axios.get('https://tod-api.vercel.app/api/dare/indonesian');
+        const dare = res.data.question || res.data.dare; // fallback kalau field beda
 
-        // Send the dare message
-        await sock.sendMessage(chatId, { text: dareMessage }, { quoted: message });
+        await sock.sendMessage(chatId, {
+            text: `🎯 Dare Indonesia:\n${dare}`
+        }, { quoted: message });
+
     } catch (error) {
-        console.error('Error in dare command:', error);
-        await sock.sendMessage(chatId, { text: '❌ Failed to get dare. Please try again later!' }, { quoted: message });
+        console.error('Error di dare command:', error);
+        await sock.sendMessage(chatId, {
+            text: '❌ Gagal ambil dare. Coba lagi nanti ya!'
+        }, { quoted: message });
     }
 }
 
