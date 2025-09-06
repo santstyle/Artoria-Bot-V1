@@ -28,31 +28,31 @@ async function getQuotedOrOwnImageUrl(sock, message) {
 async function reminiCommand(sock, chatId, message, args) {
     try {
         let imageUrl = null;
-        
+
         // Check if args contain a URL
         if (args.length > 0) {
             const url = args.join(' ');
             if (isValidUrl(url)) {
                 imageUrl = url;
             } else {
-                return sock.sendMessage(chatId, { 
-                    text: '❌ Invalid URL provided.\n\nUsage: `.remini https://example.com/image.jpg`' 
+                return sock.sendMessage(chatId, {
+                    text: '❌ Invalid URL provided.\n\nUsage: `.remini https://example.com/image.jpg`'
                 }, { quoted: message });
             }
         } else {
             // Try to get image from message or quoted message
             imageUrl = await getQuotedOrOwnImageUrl(sock, message);
-            
+
             if (!imageUrl) {
-                return sock.sendMessage(chatId, { 
-                    text: '📸 *Remini AI Enhancement Command*\n\nUsage:\n• `.remini <image_url>`\n• Reply to an image with `.remini`\n• Send image with `.remini`\n\nExample: `.remini https://example.com/image.jpg`' 
+                return sock.sendMessage(chatId, {
+                    text: '📸 *Remini AI Enhancement Command*\n\nUsage:\n• `.remini <image_url>`\n• Reply to an image with `.remini`\n• Send image with `.remini`\n\nExample: `.remini https://example.com/image.jpg`'
                 }, { quoted: message });
             }
         }
 
         // Call the Remini API
         const apiUrl = `https://api.princetechn.com/api/tools/remini?apikey=prince&url=${encodeURIComponent(imageUrl)}`;
-        
+
         const response = await axios.get(apiUrl, {
             timeout: 60000, // 60 second timeout (AI processing takes longer)
             headers: {
@@ -63,19 +63,19 @@ async function reminiCommand(sock, chatId, message, args) {
 
         if (response.data && response.data.success && response.data.result) {
             const result = response.data.result;
-            
+
             if (result.image_url) {
                 // Download the enhanced image
                 const imageResponse = await axios.get(result.image_url, {
                     responseType: 'arraybuffer',
                     timeout: 30000
                 });
-                
+
                 if (imageResponse.status === 200 && imageResponse.data) {
                     // Send the enhanced image
                     await sock.sendMessage(chatId, {
                         image: imageResponse.data,
-                        caption: '✨ *Image enhanced successfully!*\n\n𝗘𝗡𝗛𝗔𝗡𝗖𝗘𝗗 𝗕𝗬 𝗞𝗡𝗜𝗚𝗛𝗧-𝗕𝗢𝗧'
+                        caption: '✨ *Image enhanced successfully!*\n\n'
                     }, { quoted: message });
                 } else {
                     throw new Error('Failed to download enhanced image');
@@ -89,9 +89,9 @@ async function reminiCommand(sock, chatId, message, args) {
 
     } catch (error) {
         console.error('Remini Error:', error.message);
-        
+
         let errorMessage = '❌ Failed to enhance image.';
-        
+
         if (error.response?.status === 429) {
             errorMessage = '⏰ Rate limit exceeded. Please try again later.';
         } else if (error.response?.status === 400) {
@@ -105,9 +105,9 @@ async function reminiCommand(sock, chatId, message, args) {
         } else if (error.message.includes('Error processing image')) {
             errorMessage = '❌ Image processing failed. Please try with a different image.';
         }
-        
-        await sock.sendMessage(chatId, { 
-            text: errorMessage 
+
+        await sock.sendMessage(chatId, {
+            text: errorMessage
         }, { quoted: message });
     }
 }

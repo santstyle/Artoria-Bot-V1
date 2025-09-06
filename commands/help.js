@@ -80,7 +80,6 @@ Berikut menu command yang tersedia di *Artoria Bot V1*:
 • .sticker <image>
 • .tgsticker <link>
 • .take <setwm>
-• .emojimix <emj1>+<emj2>
 • .crop <image>
 • .removebg
 • .remini

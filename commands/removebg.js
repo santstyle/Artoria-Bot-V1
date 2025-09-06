@@ -34,32 +34,32 @@ module.exports = {
         try {
             const chatId = message.key.remoteJid;
             let imageUrl = null;
-            
+
             // Check if args contain a URL
             if (args.length > 0) {
                 const url = args.join(' ');
                 if (isValidUrl(url)) {
                     imageUrl = url;
                 } else {
-                    return sock.sendMessage(chatId, { 
-                        text: '❌ Invalid URL provided.\n\nUsage: `.removebg https://example.com/image.jpg`' 
+                    return sock.sendMessage(chatId, {
+                        text: '❌ Invalid URL provided.\n\nUsage: `.removebg https://example.com/image.jpg`'
                     }, { quoted: message });
                 }
             } else {
                 // Try to get image from message or quoted message
                 imageUrl = await getQuotedOrOwnImageUrl(sock, message);
-                
+
                 if (!imageUrl) {
-                    return sock.sendMessage(chatId, { 
-                        text: '📸 *Remove Background Command*\n\nUsage:\n• `.removebg <image_url>`\n• Reply to an image with `.removebg`\n• Send image with `.removebg`\n\nExample: `.removebg https://example.com/image.jpg`' 
+                    return sock.sendMessage(chatId, {
+                        text: '📸 *Remove Background Command*\n\nUsage:\n• `.removebg <image_url>`\n• Reply to an image with `.removebg`\n• Send image with `.removebg`\n\nExample: `.removebg https://example.com/image.jpg`'
                     }, { quoted: message });
                 }
             }
 
-        
+
             // Call the remove background API
             const apiUrl = `https://api.siputzx.my.id/api/iloveimg/removebg?image=${encodeURIComponent(imageUrl)}`;
-            
+
             const response = await axios.get(apiUrl, {
                 responseType: 'arraybuffer',
                 timeout: 30000, // 30 second timeout
@@ -72,7 +72,7 @@ module.exports = {
                 // Send the processed image
                 await sock.sendMessage(chatId, {
                     image: response.data,
-                    caption: '✨ *Background removed successfully!*\n\n𝗣𝗥𝗢𝗖𝗘𝗦𝗦𝗘𝗗 𝗕𝗬 𝗞𝗡𝗜𝗚𝗛𝗧-𝗕𝗢𝗧'
+                    caption: '✨ *Background removed successfully!*\n\n'
                 }, { quoted: message });
             } else {
                 throw new Error('Failed to process image');
@@ -80,9 +80,9 @@ module.exports = {
 
         } catch (error) {
             console.error('RemoveBG Error:', error.message);
-            
+
             let errorMessage = '❌ Failed to remove background.';
-            
+
             if (error.response?.status === 429) {
                 errorMessage = '⏰ Rate limit exceeded. Please try again later.';
             } else if (error.response?.status === 400) {
@@ -94,9 +94,9 @@ module.exports = {
             } else if (error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
                 errorMessage = '🌐 Network error. Please check your connection.';
             }
-            
-            await sock.sendMessage(chatId, { 
-                text: errorMessage 
+
+            await sock.sendMessage(chatId, {
+                text: errorMessage
             }, { quoted: message });
         }
     }
